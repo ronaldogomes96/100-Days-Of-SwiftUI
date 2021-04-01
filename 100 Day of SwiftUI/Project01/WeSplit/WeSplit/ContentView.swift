@@ -8,54 +8,56 @@
 import SwiftUI
 
 struct ContentView: View {
-    let students = ["Harry", "Hermione", "Ron"]
-    @State private var selectedStudent = 0
+    //Variaveis que serao usadas, precisam do @state para serem mudadas
+    @State private var checkAmount = ""
+    @State private var numberOfPeople = 2
+    @State private var tipPercentage = 2
+    let tipPercentages = [10, 15, 20, 25, 0]
     
+    //Variavel computada que calcula o valor da gorjeta de cada pessoa
+    var totalPerson: Double {
+        let peopleCount = Double(numberOfPeople + 2)
+        let tipSelection = Double(tipPercentages[tipPercentage])
+        let orderAmount = Double(checkAmount) ?? 0
+        let tipValue = (orderAmount / 100) * tipSelection
+        let grandTotal = orderAmount + tipValue
+        let amountPerPerson = grandTotal / peopleCount
+
+        return amountPerPerson
+    }
+
     var body: some View {
-        
-        VStack {
-            Picker("Select your student", selection: $selectedStudent) {
-                ForEach(0 ..< students.count) {
-                    Text(self.students[$0])
-                }
-            }
-            Text("You chose: Student # \(students[selectedStudent])")
-        }
-        var tapCount = 0
-        
-        //Dentro da navigation
         NavigationView {
-            
             Form {
-                //Criando entradas na tela
-                Text("Hello World")
-                Text("Hello World")
-                
-                //Podemos tambem criar dentro de groups
-                Group {
-                    Text("Hello World")
-                }
-                
-                //Ou dentro de sections, que sao mais organizadas, como uma table view
                 Section {
-                    Text("Hello World")
+                    //Cria um textField e ja passa o placeholder com a variavel que vai guardar esse valor
+                    TextField("Amount", text: $checkAmount)
+                        //Quando acessamos o ponto logo apos um tipo, acessamos atributos dele
+                        .keyboardType(.decimalPad)
+                    
+                    Picker("Number of people", selection: $numberOfPeople) {
+                        ForEach(2 ..< 100) {
+                            Text("\($0) people")
+                        }
+                    }
                 }
-                
+                //Podemos adicionar um header com informacoes para a section
+                Section(header: Text("How much tip do you want to leave?")) {
+                    Picker("Tip percentage", selection: $tipPercentage) {
+                        ForEach(0 ..< tipPercentages.count) {
+                            Text("\(self.tipPercentages[$0])%")
+                        }
+                    }
+                    //Com isso fica uma segmented control
+                    .pickerStyle(SegmentedPickerStyle())
+                }
                 Section {
-                    Text("Hello World")
-                    Text("Hello World")
+                    //Atualiza automaticamente
+                    Text("$\(totalPerson, specifier: "%.2f")")
                 }
             }
-            
-            //
-            Button("Tap Count: \(tapCount)") {
-                tapCount += 1
-            }
-            
-            //Titulo da navigationBar
-            .navigationBarTitle("SwiftUI")
-            
-            
+            //Informando o titulo da navigation
+            .navigationBarTitle("WeSplit")
         }
     }
 }
