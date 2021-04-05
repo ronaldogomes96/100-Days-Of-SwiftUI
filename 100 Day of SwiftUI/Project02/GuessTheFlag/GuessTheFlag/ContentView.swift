@@ -8,58 +8,66 @@
 import SwiftUI
 
 struct ContentView: View {
-    @State private var showingAlert = false
+    //Lista de paises do jogo
+    @State var countries = ["Estonia", "France", "Germany", "Ireland", "Italy", "Nigeria", "Poland", "Russia", "Spain", "UK", "US"].shuffled() // Randomiza o array
+    @State var correctAnswer = Int.random(in: 0...2)
+    
+    @State private var showingScore = false
+    @State private var scoreTitle = ""
     
     var body: some View {
-        //Stack vertical
-        VStack(alignment: .leading, spacing: 20) {
-            Text("Hello, world!")
-            //Permite a criacao de espacos entre o conteudo da stack
-            Spacer()
-            Text("This is inside a stack")
-            Spacer()
-        }
-        //Gradiente circular
-        RadialGradient(gradient: Gradient(colors: [.blue, .black]), center: .center, startRadius: 50, endRadius: 200)
-
-        
-        //Stack horizontal
-        HStack(spacing: 20) {
-            Text("Hello World")
-            Text("This is inside a stack")
-        }
-        //Gradiente linear
-        LinearGradient(gradient: Gradient(colors: [.white, .gray]), startPoint: .top, endPoint: .bottom)
-
-        
-        //Stack de visualizacao em profundidade
-        ZStack(alignment: .top) {
-            //Muda a cor da safe area
-            Color.orange
-            Text("Hello World")
-                .background(Color.white)
-        }
-        AngularGradient(gradient: Gradient(colors: [.red, .yellow, .green, .blue, .purple, .red]), center: .center)
-        
-        //Botao com uma action
-        Button(action: {
-            print("Button was tapped")
-        }) {
-            //Criando um botao complexo com uma stack horizontal e uma imagem
-            HStack(spacing: 10) {
-                Image(systemName: "pencil")
-                Text("Edit")
+        ZStack {
+            //Cor de background, com um gradiente
+            LinearGradient(gradient: Gradient(colors: [.blue, .black]), startPoint: .top, endPoint: .bottom)
+                .edgesIgnoringSafeArea(.all)
+            
+            VStack(spacing: 30) {
+                VStack {
+                    Text("Tap the flag of")
+                        .foregroundColor(.white)
+                    Text(countries[correctAnswer])
+                        .foregroundColor(.white)
+                        .font(.largeTitle)
+                        .fontWeight(.black)
+                }
+                
+                ForEach(0..<3) { number in
+                    Button(action: {
+                        self.flagTapped(number)
+                    }) {
+                        Image(self.countries[number])
+                            //Ajustes e configuracoes de imagens
+                            .renderingMode(.original)
+                            .clipShape(Capsule())
+                            .overlay(Capsule().stroke(Color.black, lineWidth: 1))
+                            .shadow(color: .black, radius: 2)
+                    }
+                }
+                //Sobe tudo para o inicio da view
+                Spacer()
             }
         }
-
-        //Criando alertas, ele volta a variavel para falso automaticamente
-        Button("Show Alert") {
-            self.showingAlert = true
+        //Cria o alerta que sera executado a cada mudanca da variavel showingScore
+        .alert(isPresented: $showingScore) {
+            Alert(title: Text(scoreTitle), message: Text("Your score is ???"), dismissButton: .default(Text("Continue")) {
+                self.askQuestion()
+            })
         }
-        .alert(isPresented: $showingAlert) {
-            Alert(title: Text("Hello SwiftUI!"), message: Text("This is some detail message"), dismissButton: .default(Text("OK")))
+    }
+    
+    func flagTapped(_ number: Int) {
+        if number == correctAnswer {
+            scoreTitle = "Correct"
+        } else {
+            scoreTitle = "Wrong"
         }
-
+        
+        showingScore = true
+    }
+    
+    func askQuestion() {
+        countries.shuffle()
+        correctAnswer = Int.random(in: 0...2)
     }
 }
 
