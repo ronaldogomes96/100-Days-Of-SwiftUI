@@ -15,6 +15,8 @@ struct ContentView: View {
     @State private var showingScore = false
     @State private var scoreTitle = ""
     
+    @State var userScore = 0
+    
     var body: some View {
         ZStack {
             //Cor de background, com um gradiente
@@ -43,13 +45,17 @@ struct ContentView: View {
                             .shadow(color: .black, radius: 2)
                     }
                 }
+                
+                Text("Your Score is \(userScore)")
+                    .foregroundColor(.white)
+                
                 //Sobe tudo para o inicio da view
                 Spacer()
             }
         }
         //Cria o alerta que sera executado a cada mudanca da variavel showingScore
         .alert(isPresented: $showingScore) {
-            Alert(title: Text(scoreTitle), message: Text("Your score is ???"), dismissButton: .default(Text("Continue")) {
+            Alert(title: Text(scoreTitle), message: Text("Your score is \(userScore)"), dismissButton: .default(Text("Continue")) {
                 self.askQuestion()
             })
         }
@@ -58,8 +64,10 @@ struct ContentView: View {
     func flagTapped(_ number: Int) {
         if number == correctAnswer {
             scoreTitle = "Correct"
+            userScore += 1
         } else {
-            scoreTitle = "Wrong"
+            scoreTitle = "Wrong! That’s the flag of \(countries[number])"
+            userScore -= 1
         }
         
         showingScore = true
