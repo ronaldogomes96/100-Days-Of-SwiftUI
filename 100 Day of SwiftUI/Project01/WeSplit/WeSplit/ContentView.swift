@@ -54,6 +54,7 @@ struct ContentView: View {
                 Section(header: Text("Total Amount")) {
                     //Valor total da conta com a gorjeta
                     Text("$\(self.totalPerson * (Double(self.numberOfPeople) ?? 2), specifier: "%.2f")")
+                        .foregroundColor(self.tipPercentage == 4 ? .red : .none)
                 }
             }
             //Informando o titulo da navigation
