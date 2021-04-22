@@ -19,65 +19,11 @@ struct ContentView: View {
     @State private var wakeUp = defaultWakeTime
     @State private var sleepAmount = 8.0
     @State private var coffeeAmount = 1
-    @State private var alertTitle = ""
-    @State private var alertMessage = ""
     @State private var showingAlert = false
     
-    
-    
-    var body: some View {
-        NavigationView {
-            Form {
-                
-                //Colocamos cada um numa vstack pois sao processos e logicas diferentes
-                VStack(alignment: .leading, spacing: 0) {
-                    //Primeiro elemento da stack
-                    Text("When do you want to wake up?")
-                        .font(.headline)
-                    
-                    DatePicker("Please enter a time", selection: $wakeUp, displayedComponents: .hourAndMinute)
-                        //Nao mostra a label que foi definida
-                        .labelsHidden()
-                        .datePickerStyle(WheelDatePickerStyle())
-                }
-                
-                VStack(alignment: .leading, spacing: 0) {
-                    //Segundo elemento da stack
-                    Text("Desired amount of sleep")
-                        .font(.headline)
-                    
-                    Stepper(value: $sleepAmount, in: 4...12, step: 0.25) {
-                        Text("\(sleepAmount, specifier: "%g") hours")
-                    }
-                    
-                }
-                
-                VStack(alignment: .leading, spacing: 0) {
-                    //Terceiro elemento da stack
-                    Text("Daily coffee intake")
-                        .font(.headline)
-
-                    Stepper(value: $coffeeAmount, in: 1...20) {
-                        Text("\(coffeeAmount) cup\(coffeeAmount == 1 ? "" : "s")")
-                    }
-                }
-                
-                .alert(isPresented: $showingAlert) {
-                    Alert(title: Text(alertTitle), message: Text(alertMessage), dismissButton: .default(Text("OK")))
-                }
-            }
-            
-            //Configuracao da navigation bar
-            .navigationBarTitle("BetterRest")
-            .navigationBarItems(trailing:
-                Button(action: calculateBedtime) {
-                    Text("Calculate")
-                }
-            )
-        }
-    }
-    
-    func calculateBedtime() {
+    var beedtime: String {
+        var alertMessage: String
+        var alertTitle: String
         //Instancia do modelo coreml
         let model = SleepCalculator()
         
@@ -100,7 +46,50 @@ struct ContentView: View {
             alertTitle = "Error"
             alertMessage = "Sorry, there was a problem calculating your bedtime."
         }
-        showingAlert = true
+        
+        return "Your beedtime is \(alertTitle + alertMessage)"
+    }
+    
+    
+    
+    var body: some View {
+        NavigationView {
+            Form {
+                
+                //Colocamos cada um numa vstack pois sao processos e logicas diferentes
+                Section(header: Text("When do you want to wake up?") ) {
+                    
+                    DatePicker("Please enter a time", selection: $wakeUp, displayedComponents: .hourAndMinute)
+                        //Nao mostra a label que foi definida
+                        .labelsHidden()
+                        .datePickerStyle(WheelDatePickerStyle())
+                }
+                
+                Section(header: Text("Desired amount of sleep")) {
+
+                    Stepper(value: $sleepAmount, in: 4...12, step: 0.25) {
+                        Text("\(sleepAmount, specifier: "%g") hours")
+                    }
+                    
+                }
+                
+                Section(header: Text("Daily coffee intake")) {
+
+                    Picker("Cups of coffe" , selection: $coffeeAmount) {
+                        ForEach(1..<20) { timeCofee in
+                            Text("\(timeCofee) cup\(coffeeAmount == 1 ? "" : "s")")
+                        }
+                    }
+                }
+                
+                Section {
+                    Text(beedtime)
+                }
+            }
+            
+            //Configuracao da navigation bar
+            .navigationBarTitle("BetterRest")
+        }
     }
 }
 
