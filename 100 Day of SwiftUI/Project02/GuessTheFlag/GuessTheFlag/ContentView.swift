@@ -15,6 +15,9 @@ struct ContentView: View {
     @State private var showingScore = false
     @State private var scoreTitle = ""
     
+    @State var isCorrect = false
+    @State var isIncorrect = false
+    
     @State var userScore = 0
     
     var body: some View {
@@ -36,8 +39,13 @@ struct ContentView: View {
                 ForEach(0..<3) { number in
                     Button(action: {
                         self.flagTapped(number)
+                        self.isCorrect.toggle()
                     }) {
                         FlagImages(imageName: self.countries[number])
+                            .rotation3DEffect(
+                                .degrees(360),
+                                axis: (x: 0.0, y: 1.0, z: 0.0)
+                            )
                     }
                 }
                 
@@ -59,9 +67,11 @@ struct ContentView: View {
     func flagTapped(_ number: Int) {
         if number == correctAnswer {
             scoreTitle = "Correct"
+            isCorrect = true
             userScore += 1
         } else {
             scoreTitle = "Wrong! That’s the flag of \(countries[number])"
+            isIncorrect = true
             userScore -= 1
         }
         
