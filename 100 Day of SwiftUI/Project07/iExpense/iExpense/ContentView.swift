@@ -24,7 +24,7 @@ struct ContentView: View {
                         }
 
                         Spacer()
-                        Text("$\(item.amount)")
+                        Text("\(item.amount)")
                     }
                 }
                 .onDelete(perform: removeItems)

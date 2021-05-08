@@ -15,6 +15,7 @@ struct AddView: View {
     @Environment(\.presentationMode) var presentationMode
     
     @ObservedObject var expenses: Expenses
+    @State var isNotANumber: Bool = false
     
     var body: some View {
         NavigationView {
@@ -37,8 +38,13 @@ struct AddView: View {
                     let item = ExpenseItem(name: self.name, type: self.type, amount: actualAmount)
                     self.expenses.items.append(item)
                     self.presentationMode.wrappedValue.dismiss()
+                } else {
+                    isNotANumber.toggle()
                 }
             })
+            .alert(isPresented: $isNotANumber) {
+                Alert(title: Text("Not a number"), message: Text("\(self.amount) is not a number"), dismissButton: .default(Text("OK")))
+            }
         }
     }
 }
