@@ -8,46 +8,43 @@
 import SwiftUI
 
 struct ContentView: View {
-    //Podemos usar a struct para pegar os valores e isso funciona para uma view, porem para mais de uma nao pois é feita a copia da struct
-    @ObservedObject  private var user = User()
-    @State private var showingSheet = false
-    @State private var numbers = [Int]()
-    @State private var currentNumber = 1
+    //@ObservedObject aqui pede ao SwiftUI para observar o objeto para qualquer anúncio de mudança, então sempre que uma de nossas propriedades @Published mudar, a visão irá atualizar seu corpo.
+    @ObservedObject var expenses = Expenses()
+    @State private var showingAddExpense = false
 
     var body: some View {
-        
-        VStack {
+        NavigationView {
             List {
-                ForEach(numbers, id: \.self) {
-                    Text("\($0)")
+                ForEach(expenses.items) { item in
+                    HStack(spacing: 20) {
+                        VStack(alignment: .leading) {
+                            Text(item.name)
+                                .font(.headline)
+                            Text(item.type)
+                        }
+
+                        Spacer()
+                        Text("$\(item.amount)")
+                    }
                 }
-                // Permite a opcao de delete
-                .onDelete(perform: { indexSet in
-                    numbers.remove(atOffsets: indexSet)
-                })
+                .onDelete(perform: removeItems)
             }
-            
-            Button("Add Number") {
-                self.numbers.append(self.currentNumber)
-                self.currentNumber += 1
-            }
+            .navigationBarTitle("iExpense")
+            .navigationBarItems(trailing:
+                Button(action: {
+                    self.showingAddExpense = true
+                }) {
+                    Image(systemName: "plus")
+                }
+            )
         }
-        
-//        VStack {
-//            Text("Your name is \(user.firstName) \(user.lastName).")
-//
-//            TextField("First name", text: $user.firstName)
-//            TextField("Last name", text: $user.lastName)
-//        }
-//        Button("Show Sheet") {
-//            // show the sheet
-//            self.showingSheet.toggle()
-//        }
-//        //Mostrando uma outra tela
-//        .sheet(isPresented: $showingSheet, content: {
-//            //Podemos passar parametros
-//            SecondView(name: "Ronaldo")
-//        })
+        .sheet(isPresented: $showingAddExpense) {
+            AddView(expenses: self.expenses)
+        }
+    }
+    
+    func removeItems(at offsets: IndexSet) {
+        expenses.items.remove(atOffsets: offsets)
     }
 }
 
@@ -57,29 +54,33 @@ struct ContentView_Previews: PreviewProvider {
     }
 }
 
-//Poderiamos trasnformar em classe porem ele nao atualiza com @state
-//struct User {
-//    var firstName = "Bilbo"
-//    var lastName = "Baggins"
-//}
-
-/*
- @Published é mais ou menos metade de @State: ele diz ao Swift que sempre que uma dessas duas propriedades muda, ele deve enviar um anúncio para qualquer visualização do SwiftUI que está observando que eles devem recarregar.
- */
-class User: ObservableObject {
-    @Published var firstName = "Bilbo"
-    @Published var lastName = "Baggins"
+struct ExpenseItem: Identifiable, Codable {
+    var id = UUID() //Gera id hexadecimais aleatorios
+    let name: String
+    let type: String
+    let amount: Int
 }
 
-struct SecondView: View {
-    @Environment(\.presentationMode) var presentationMode
-    var name: String
-    
-    var body: some View {
-        Text("Hello, \(name)!")
-        
-        Button("Dismiss") {
-            self.presentationMode.wrappedValue.dismiss()
+class Expenses: ObservableObject {
+    // @Published quer dizer que vai ser monitorado por outra coisa
+    @Published var items = [ExpenseItem]() {
+        didSet {
+            let encoder = JSONEncoder()
+            if let encoded = try? encoder.encode(items) {
+                UserDefaults.standard.set(encoded, forKey: "Items")
+            }
         }
+    }
+    
+    init() {
+        if let items = UserDefaults.standard.data(forKey: "Items") {
+            let decoder = JSONDecoder()
+            if let decoded = try? decoder.decode([ExpenseItem].self, from: items) {
+                self.items = decoded
+                return
+            }
+        }
+
+        self.items = []
     }
 }
