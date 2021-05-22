@@ -11,6 +11,8 @@ struct ContentView: View {
     let astronauts: [Astronaut] = Bundle.main.decodeForAstronautArray("astronauts.json")
     let missions: [Mission] = Bundle.main.decodeForAstronautArray("missions.json")
     
+    @State var isDate: Bool = true
+    
     var body: some View {
         NavigationView {
             List(missions) { mission in

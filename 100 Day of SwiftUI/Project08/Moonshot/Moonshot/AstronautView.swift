@@ -22,10 +22,28 @@ struct AstronautView: View {
                     Text(self.astronaut.description)
                         .padding()
                         .layoutPriority(1)
+                    
+                    List(getAllMissionsForAstronout()) {
+                        Text($0.displayName)
+                    }
                 }
             }
         }
         .navigationBarTitle(Text(astronaut.name), displayMode: .inline)
+    }
+    
+    func getAllMissionsForAstronout() -> [Mission] {
+        let missions: [Mission] = Bundle.main.decodeForAstronautArray("missions.json")
+        var missionsForAstronauts = [Mission]()
+        for creaw in missions {
+            for astro in creaw.crew {
+                if astro.name == astronaut.id {
+                    missionsForAstronauts.append(creaw)
+                }
+            }
+        }
+        
+        return missionsForAstronauts
     }
 }
 

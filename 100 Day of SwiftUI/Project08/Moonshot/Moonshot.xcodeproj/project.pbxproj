@@ -111,8 +111,8 @@
 			children = (
 				D11B2E4B2650AE2300D994D8 /* MoonshotApp.swift */,
 				D11B2E4D2650AE2300D994D8 /* ContentView.swift */,
-				D11B2E822650C6A000D994D8 /* AstronautView.swift */,
 				D11B2E802650C21200D994D8 /* MissionView.swift */,
+				D11B2E822650C6A000D994D8 /* AstronautView.swift */,
 				D11B2E7E2650B93B00D994D8 /* Mission.swift */,
 				D11B2E7A2650B74400D994D8 /* Astronaut.swift */,
 				D11B2E7C2650B77E00D994D8 /* Bundle-Decodable.swift */,
